@@ -94,21 +94,31 @@ export async function getPost(id: number) {
   };
 }
 
-// export async function deletePost(id: number) {
-//   const postRepository = await getRepository(Post);
-//   const post = await postRepository.findOne({
-//     where: { id },
-//     relations: { user: true },
-//   });
+export async function deletePost(id: number) {
+  const session = await verifySession();
 
-//   if (!post) {
-//     return { error: '投稿が見つかりません' };
-//   }
+  if (!session || !session.userId) {
+    return { error: 'ログインしてください' };
+  }
 
-//   // 本人の投稿か確認
-//   if (post.user.id !== Number(session.userId)) {
-//     return { error: '削除権限がありません' };
-//   }
+  const postRepository = await getRepository(Post);
 
-//   await postRepository.remove(post);
-// }
+  const post = await postRepository.findOne({
+    where: { id },
+    relations: { user: true },
+  });
+
+  if (!post) {
+    return { error: '投稿が見つかりません' };
+  }
+
+  // 本人の投稿か確認
+  if (post.user.id !== Number(session.userId)) {
+    return { error: '削除権限がありません' };
+  }
+
+  await postRepository.remove(post);
+
+  updateTag('posts');
+  redirect('/');
+}
