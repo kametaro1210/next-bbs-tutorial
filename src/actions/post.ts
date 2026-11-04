@@ -4,7 +4,7 @@ import { Post } from '@/entities/Post';
 import { User } from '@/entities/User';
 import { getRepository } from '@/utils/data-source';
 import { verifySession } from '@/utils/session';
-import { updateTag } from 'next/cache';
+import { cacheTag, updateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 
@@ -44,29 +44,32 @@ export async function createPost(formData: FormData) {
     console.error(e);
     return { error: '投稿の作成中にエラーが発生しました' };
   }
-
+  // revalidateTag('posts','max')
   updateTag('posts');
   redirect('/');
 }
 
-// export async function getPosts() {
-//   const postRepository = await getRepository(Post);
+export async function getPosts() {
+  'use cache';
+  cacheTag('posts');
 
-//   // 投稿一覧を取得（作成日時の降順）
-//   const posts = await postRepository.find({
-//     relations: {
-//       user: true,
-//     },
-//     order: {
-//       createdAt: 'DESC',
-//     },
-//   });
+  const postRepository = await getRepository(Post);
 
-//   return posts.map((post) => ({
-//     ...post,
-//     user: { ...post.user },
-//   }));
-// }
+  // 投稿一覧を取得（作成日時の降順）
+  const posts = await postRepository.find({
+    relations: {
+      user: true,
+    },
+    order: {
+      createdAt: 'DESC',
+    },
+  });
+
+  return posts.map((post) => ({
+    ...post,
+    user: { ...post.user },
+  }));
+}
 
 // export async function getPost(id: number) {
 //   const postRepository = await getRepository(Post);

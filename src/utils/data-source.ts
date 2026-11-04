@@ -53,7 +53,7 @@ export const getDataSource = async (): Promise<DataSource> => {
 };
 
 // リポジトリ取得用のショートカット 
-export const getRepository = async <T extends ObjectLiteral>(
+export const getRepository = async <T extends ObjectLiteral>( 
   entity: EntityTarget<T>
 ): Promise<Repository<T>> => {
   const dataSource = await getDataSource();
@@ -61,4 +61,4 @@ export const getRepository = async <T extends ObjectLiteral>(
 };
 
 // マイグレーション用などはAppDataSourceを直接使う
-export const AppDataSource = appDataSource;
+export const AppDataSource = appDataSource; 
