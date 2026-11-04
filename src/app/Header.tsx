@@ -1,6 +1,11 @@
+import { logout } from '@/actions/auth';
+import { verifySession } from '@/utils/session';
 import Link from 'next/link';
 
-export default function Header() {
+export default async function Header() {
+
+  const session = await verifySession();
+
   return (
     <header
       style={{ backgroundColor: '#333', color: '#fff', padding: '15px 0' }}
@@ -14,17 +19,20 @@ export default function Header() {
         }}
       >
         <h1>
-          <Link href='#' style={{ fontSize: '24px', fontWeight: 'bold' }}>
+          <Link href='/' style={{ fontSize: '24px', fontWeight: 'bold' }}>
             BBS App
           </Link>
         </h1>
-        {/* <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <Link href='#' style={{ fontWeight: 'bold' }}>
+
+        {/* ログイン中のユーザーIDが存在する場合のみ、投稿リンクやログアウトボタンを表示する */}
+        {session && session.userId && (
+          <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <Link href="/posts/create" style={{ fontWeight: 'bold' }}>
               投稿する
             </Link>
-            <form>
+            <form action={logout}>
               <button
-                type='submit'
+                type="submit"
                 style={{
                   backgroundColor: 'transparent',
                   border: 'none',
@@ -37,7 +45,8 @@ export default function Header() {
                 ログアウト
               </button>
             </form>
-          </nav> */}
+          </nav>
+        )}
       </div>
     </header>
   );

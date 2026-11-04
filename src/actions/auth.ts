@@ -2,7 +2,7 @@
 
 import { User } from '@/entities/User';
 import { getRepository } from '@/utils/data-source';
-import { createSession } from '@/utils/session';
+import { createSession, deleteSession } from '@/utils/session';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 
@@ -73,4 +73,9 @@ export async function login(formData: FormData) {
 
   redirect('/');
 
+}
+
+export async function logout() {
+  await deleteSession();
+  redirect('/login');
 }
