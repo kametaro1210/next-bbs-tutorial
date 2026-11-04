@@ -2,6 +2,7 @@
 
 import { User } from '@/entities/User';
 import { getRepository } from '@/utils/data-source';
+import { createSession } from '@/utils/session';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 
@@ -43,27 +44,33 @@ export async function signup(formData: FormData) {
 
   redirect('/');
 
-
 }
 
-// export async function login(formData: FormData) {
-//   try {
-//     const userRepository = await getRepository(User);
-//     const user = await userRepository.findOneBy({ email });
+export async function login(formData: FormData) {
 
-//     if (!user) {
-//       return { error: 'メールアドレスまたはパスワードが正しくありません' };
-//     }
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
 
-//     const passwordMatch = await bcrypt.compare(password, user.password);
+  try {
+    const userRepository = await getRepository(User);
+    const user = await userRepository.findOneBy({ email });
 
-//     if (!passwordMatch) {
-//       return { error: 'メールアドレスまたはパスワードが正しくありません' };
-//     }
+    if (!user) {
+      return { error: 'メールアドレスまたはパスワードが正しくありません' };
+    }
 
-//     await createSession(user.id.toString());
-//   } catch (e) {
-//     console.error(e);
-//     return { error: 'ログイン中にエラーが発生しました' };
-//   }
-// }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return { error: 'メールアドレスまたはパスワードが正しくありません' };
+    }
+
+    await createSession(user.id.toString());
+  } catch (e) {
+    console.error(e);
+    return { error: 'ログイン中にエラーが発生しました' };
+  }
+
+  redirect('/');
+
+}

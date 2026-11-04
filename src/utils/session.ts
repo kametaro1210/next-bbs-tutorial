@@ -1,8 +1,8 @@
-import 'server-only';
 import { cookies } from 'next/headers';
-import { encrypt, decrypt } from './jwt';
+import 'server-only';
+import { decrypt, encrypt } from './jwt';
 
-export async function createSession(userId: string) {
+export async function createSession(userId: string) { 
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const session = await encrypt({ userId, expiresAt });
 
