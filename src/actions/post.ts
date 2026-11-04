@@ -71,22 +71,28 @@ export async function getPosts() {
   }));
 }
 
-// export async function getPost(id: number) {
-//   const postRepository = await getRepository(Post);
+export async function getPost(id: number) {
+  'use cache';
+  console.log('call');
+  cacheTag(`post-${id}`);
 
-//   const post = await postRepository.findOne({
-//     where: { id },
-//     relations: {
-//       user: true,
-//     },
-//   });
+  const postRepository = await getRepository(Post);
 
-//   if (!post) return null;
-//   return {
-//     ...post,
-//     user: { ...post.user },
-//   };
-// }
+  const post = await postRepository.findOne({
+    where: { id },
+
+    // 投稿データに紐づくユーザー情報も一緒に取得する
+    relations: {
+      user: true,
+    },
+  });
+
+  if (!post) return null;
+  return {
+    ...post,
+    user: { ...post.user },
+  };
+}
 
 // export async function deletePost(id: number) {
 //   const postRepository = await getRepository(Post);
