@@ -16,7 +16,7 @@ export async function createSession(userId: string) {
   });
 } 
 
-export async function verifySession() {
+export async function verifySession() { 
   const cookieStore = await cookies();
   const cookie = cookieStore.get('session');
   const session = await decrypt(cookie?.value);
@@ -26,7 +26,7 @@ export async function verifySession() {
   }
 
   return { isAuth: true, userId: session.userId as string };
-}
+} 
 
 export async function deleteSession() {
   const cookieStore = await cookies();

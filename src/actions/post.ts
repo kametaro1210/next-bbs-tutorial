@@ -1,35 +1,53 @@
-// 'use server';
+'use server';
 
-// import { redirect } from 'next/navigation';
-// import { revalidateTag, cacheTag } from 'next/cache';
-// import { AppDataSource, getRepository } from '@/utils/data-source';
-// import { Post } from '@/entities/Post';
-// import { verifySession } from '@/utils/session';
-// import { User } from '@/entities/User';
+import { Post } from '@/entities/Post';
+import { User } from '@/entities/User';
+import { getRepository } from '@/utils/data-source';
+import { verifySession } from '@/utils/session';
+import { updateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 
-// export async function createPost(formData: FormData) {
-//   try {
-//     const postRepository = await getRepository(Post);
-//     const userRepository = await getRepository(User);
 
-//     // ユーザーの取得（リレーションのため）
-//     const user = await userRepository.findOneBy({ id: Number(session.userId) });
-//     if (!user) {
-//       return { error: 'ユーザーが見つかりません' };
-//     }
+export async function createPost(formData: FormData) {
 
-//     const newPost = postRepository.create({
-//       title,
-//       content,
-//       user: user, // ユーザーオブジェクトをセット
-//     });
+  const title = formData.get('title') as string;
+  const content = formData.get('content') as string;
 
-//     await postRepository.save(newPost);
-//   } catch (e) {
-//     console.error(e);
-//     return { error: '投稿の作成中にエラーが発生しました' };
-//   }
-// }
+  try {
+    const session = await verifySession();
+    if (!session || !session.userId) {
+      return { error: 'ログインしてください' };
+    }
+
+    const postRepository = await getRepository(Post);
+    const userRepository = await getRepository(User);
+
+    // どちらかが入力されてない場合、errorを返す
+    if (!title || !content) {
+      return { error: 'タイトルと本文を入力してください' };
+    }
+
+    // ユーザーの取得（リレーションのため）
+    const user = await userRepository.findOneBy({ id: Number(session.userId) });
+    if (!user) {
+      return { error: 'ユーザーが見つかりません' };
+    }
+
+    const newPost = postRepository.create({
+      title,
+      content,
+      user: user, // ユーザーオブジェクトをセット
+    });
+
+    await postRepository.save(newPost);
+  } catch (e) {
+    console.error(e);
+    return { error: '投稿の作成中にエラーが発生しました' };
+  }
+
+  updateTag('posts');
+  redirect('/');
+}
 
 // export async function getPosts() {
 //   const postRepository = await getRepository(Post);
