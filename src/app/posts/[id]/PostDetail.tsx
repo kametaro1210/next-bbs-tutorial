@@ -43,7 +43,7 @@ export default async function PostDetail({
 
       {isOwner && (
         <div style={{ marginTop: '20px' }}>
-          <DeletePostButton />
+          <DeletePostButton postId={post.id} />
         </div>
       )}
     </>
