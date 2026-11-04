@@ -1,8 +1,8 @@
+import path from 'path';
 import 'reflect-metadata';
 import { DataSource, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
-import path from 'path';
-import { User } from '../entities/User';
 import { Post } from '../entities/Post';
+import { User } from '../entities/User';
 
 // データソースの定義
 const dbUrl = process.env.POSTGRES_URL;
@@ -52,7 +52,7 @@ export const getDataSource = async (): Promise<DataSource> => {
   return initializedDataSource;
 };
 
-// リポジトリ取得用のショートカット
+// リポジトリ取得用のショートカット 
 export const getRepository = async <T extends ObjectLiteral>(
   entity: EntityTarget<T>
 ): Promise<Repository<T>> => {
